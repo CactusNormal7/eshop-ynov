@@ -1,3 +1,4 @@
+using Catalog.API.Features.Products.Commands.BulkImportProducts;
 using Catalog.API.Features.Products.Commands.CreateProduct;
 using Catalog.API.Features.Products.Commands.DeleteProduct;
 using Catalog.API.Features.Products.Commands.UpdateProduct;
@@ -106,5 +107,26 @@ public class ProductsController(ISender sender) : ControllerBase
     {
         var result = await sender.Send(new DeleteProductCommand(id));
         return Ok(result.IsSuccessful);
+    }
+
+    /// <summary>
+    /// Imports multiple products from an Excel file.
+    /// </summary>
+    /// <param name="excelFile">The Excel file containing product data.</param>
+    /// <returns>A result object containing the import statistics and any errors encountered.</returns>
+    [HttpPost("bulk-import")]
+    [ProducesResponseType(typeof(BulkImportProductsCommandResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BadRequestObjectResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<BulkImportProductsCommandResult>> BulkImportProducts(IFormFile excelFile)
+    {
+        if (excelFile == null || excelFile.Length == 0)
+        {
+            return BadRequest("Excel file is required");
+        }
+
+        var command = new BulkImportProductsCommand { ExcelFile = excelFile };
+        var result = await sender.Send(command);
+        
+        return Ok(result);
     }
 }
