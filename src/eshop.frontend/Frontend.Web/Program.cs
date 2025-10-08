@@ -9,11 +9,20 @@ builder.Services.AddRazorComponents()
 // Configure HttpClient for Catalog API
 var baseUrl = Environment.GetEnvironmentVariable("CATALOG_API_BASE_URL")
               ?? builder.Configuration["CatalogApi:BaseUrl"]
-              ?? "https://localhost:5001"; // default fallback
+              ?? "http://localhost:5240"; // default fallback
 
 builder.Services.AddHttpClient("CatalogApi", client =>
 {
     client.BaseAddress = new Uri(baseUrl);
+}).ConfigurePrimaryHttpMessageHandler(() =>
+{
+    var handler = new HttpClientHandler();
+    if (builder.Environment.IsDevelopment())
+    {
+        // In development, ignore SSL certificate errors
+        handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+    }
+    return handler;
 });
 
 var app = builder.Build();

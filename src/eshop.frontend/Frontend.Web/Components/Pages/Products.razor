@@ -1,6 +1,9 @@
 @page "/products"
 @using Frontend.Web.Models
+@using Microsoft.Extensions.Logging
 @inject IHttpClientFactory ClientFactory
+@inject ILogger<Products> Logger
+@rendermode InteractiveServer
 
 <PageTitle>Products</PageTitle>
 
@@ -49,9 +52,10 @@ else
 }
 
 @code {
+    
     private int pageNumber = 1;
     private int pageSize = 10;
-    private PaginatedResult<ProductDto>? result;
+    private PaginatedResult<ProductDto>? result; 
     private string? error;
 
     private int totalPages => result is null || result.PageSize == 0
@@ -60,16 +64,21 @@ else
 
     private async Task LoadProducts()
     {
+        Logger.LogInformation("Loading products page {PageNumber} with size {PageSize}", pageNumber, pageSize);
+
         error = null;
         try
         {
             var client = ClientFactory.CreateClient("CatalogApi");
             var url = $"/Products?pageNumber={pageNumber}&pageSize={pageSize}";
             result = await client.GetFromJsonAsync<PaginatedResult<ProductDto>>(url);
+            StateHasChanged(); // Force UI update
         }
         catch (Exception ex)
         {
+            Logger.LogError(ex, "Failed to load products");
             error = $"Failed to load products: {ex.Message}";
+            StateHasChanged(); // Force UI update even on error
         }
     }
 }
