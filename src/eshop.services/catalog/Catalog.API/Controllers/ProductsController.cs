@@ -2,6 +2,7 @@ using Catalog.API.Features.Products.Commands.CreateProduct;
 using Catalog.API.Features.Products.Commands.DeleteProduct;
 using Catalog.API.Features.Products.Commands.UpdateProduct;
 using Catalog.API.Features.Products.Queries.GetProductById;
+using Catalog.API.Features.Products.Queries.GetProductsByPagination;
 using Catalog.API.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -51,18 +52,29 @@ public class ProductsController(ISender sender) : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves a collection of products from the catalog.
+    /// Retrieves a paginated collection of products from the catalog.
     /// </summary>
-    /// <returns>A collection of products wrapped in an action result.</returns>
+    /// <param name="pageNumber">The 1-based page number to retrieve. Defaults to 1.</param>
+    /// <param name="pageSize">The number of items per page. Defaults to 10.</param>
+    /// <remarks>
+    /// Usage:
+    /// - GET /products?pageNumber=1&amp;pageSize=10
+    /// - If omitted, defaults are applied: pageNumber=1, pageSize=10.
+    ///
+    /// Example curl:
+    /// curl -X GET "https://localhost:5001/products?pageNumber=2&amp;pageSize=20" -H  "accept: application/json"
+    ///
+    /// The response body contains pagination metadata (PageIndex, PageSize, TotalCount) and the Data array.
+    /// </remarks>
+    /// <returns>A paginated result containing products and pagination metadata.</returns>
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<Product>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<Product>>> GetProducts(
-        [FromQuery] int pageNumber
-       , [FromQuery] int pageSize)
+    [ProducesResponseType(typeof(BuildingBlocks.Pagination.PaginatedResult<Product>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<BuildingBlocks.Pagination.PaginatedResult<Product>>> GetProducts(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
     {
-        // TODO
-        var result = await sender.Send(new ()); 
-        return Ok();
+        var result = await sender.Send(new GetProductsByPaginationQuery(pageNumber, pageSize));
+        return Ok(result.Products);
     }
 
     /// <summary>
