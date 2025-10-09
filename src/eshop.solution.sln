@@ -1,5 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# 
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eshop.clients", "eshop.clients", "{8996F067-7FD0-41F5-B91B-1F3098401949}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eshop.gateway", "eshop.gateway", "{0D5AA7AA-C67C-4D0C-9C2B-D1CD5CFB5E4F}"
@@ -30,6 +31,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks", "eshop.shared\blocks\BuildingBlocks\BuildingBlocks.csproj", "{1259ABFA-EC5E-429D-A81F-7993E7CB6E09}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eshop.frontend", "eshop.frontend", "{2158B67F-3922-4A73-A454-2AD2BF10CA40}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frontend.Web", "eshop.frontend\Frontend.Web\Frontend.Web.csproj", "{C87C74A5-9394-467C-887A-68ABEF78B640}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +48,7 @@ Global
 		{9311966F-6E39-43C6-808E-58D8B4E19BB8} = {98BE4035-0A6E-49EE-839A-C75AF5DE0978}
 		{545B5213-3E49-4315-B6D7-487DCAF12138} = {D7E7EC50-279D-4882-9651-A4EEFEFFAC53}
 		{1259ABFA-EC5E-429D-A81F-7993E7CB6E09} = {9311966F-6E39-43C6-808E-58D8B4E19BB8}
+		{C87C74A5-9394-467C-887A-68ABEF78B640} = {2158B67F-3922-4A73-A454-2AD2BF10CA40}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{545B5213-3E49-4315-B6D7-487DCAF12138}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -53,5 +59,9 @@ Global
 		{1259ABFA-EC5E-429D-A81F-7993E7CB6E09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1259ABFA-EC5E-429D-A81F-7993E7CB6E09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1259ABFA-EC5E-429D-A81F-7993E7CB6E09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C87C74A5-9394-467C-887A-68ABEF78B640}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C87C74A5-9394-467C-887A-68ABEF78B640}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C87C74A5-9394-467C-887A-68ABEF78B640}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C87C74A5-9394-467C-887A-68ABEF78B640}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
