@@ -1,6 +1,10 @@
+using Catalog.API.Features.Products.Commands.BulkImportProducts;
 using Catalog.API.Features.Products.Commands.CreateProduct;
+using Catalog.API.Features.Products.Commands.DeleteProduct;
+using Catalog.API.Features.Products.Commands.ExportProduct;
 using Catalog.API.Features.Products.Commands.UpdateProduct;
 using Catalog.API.Features.Products.Queries.GetProductById;
+using Catalog.API.Features.Products.Queries.GetProductsByPagination;
 using Catalog.API.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -44,24 +48,39 @@ public class ProductsController(ISender sender) : ControllerBase
         // TODO
         if (string.IsNullOrWhiteSpace(category))
             return BadRequest("Category is required");
-        
-        var result = await sender.Send(new ());
+
+        var result = await sender.Send(new());
         return Ok();
     }
 
     /// <summary>
-    /// Retrieves a collection of products from the catalog.
+    /// Retrieves a paginated collection of products from the catalog.
     /// </summary>
-    /// <returns>A collection of products wrapped in an action result.</returns>
+    /// <param name="pageNumber">The 1-based page number to retrieve. Defaults to 1.</param>
+    /// <param name="pageSize">The number of items per page. Defaults to 10.</param>
+    /// <remarks>
+    /// Usage:
+    /// - GET /products?pageNumber=1&amp;pageSize=10
+    /// - If omitted, defaults are applied: pageNumber=1, pageSize=10.
+    ///
+    /// Example curl:
+    /// curl -X GET "https://localhost:5001/products?pageNumber=2&amp;pageSize=20" -H  "accept: application/json"
+    ///
+    /// The response body contains pagination metadata (PageIndex, PageSize, TotalCount) and the Data array.
+    /// </remarks>
+    /// <returns>A paginated result containing products and pagination metadata.</returns>
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<Product>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<Product>>> GetProducts(
-        [FromQuery] int pageNumber
-       , [FromQuery] int pageSize)
+    [ProducesResponseType(typeof(BuildingBlocks.Pagination.PaginatedResult<Product>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<BuildingBlocks.Pagination.PaginatedResult<Product>>> GetProducts(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] int maxPrice = 0,
+        [FromQuery] int minPrice = 0,
+        [FromQuery] string[] categories = null)
     {
-        // TODO
-        var result = await sender.Send(new ()); 
-        return Ok();
+        var result =
+            await sender.Send(new GetProductsByPaginationQuery(pageNumber, pageSize, categories, maxPrice, minPrice));
+        return Ok(result.Products);
     }
 
     /// <summary>
@@ -88,7 +107,11 @@ public class ProductsController(ISender sender) : ControllerBase
     [ProducesResponseType(typeof(NotFoundObjectResult), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<bool>> UpdateProduct(Guid id, [FromBody] UpdateProductCommand request)
     {
-        // TODO
+        if (id != request.Id)
+        {
+            return BadRequest("ID in URL does not match ID in body");
+        }
+
         var result = await sender.Send(request);
         return Ok(result.IsSuccessful);
     }
@@ -103,10 +126,49 @@ public class ProductsController(ISender sender) : ControllerBase
     [ProducesResponseType(typeof(NotFoundObjectResult), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<Product>> DeleteProduct(Guid id)
     {
-        // TODO
-        var result = await sender.Send(new ());
-        return Ok();
+        var result = await sender.Send(new DeleteProductCommand(id));
+        return Ok(result.IsSuccessful);
     }
-    
-    // TODO : faire une ressource pour importer à partir d'un fichier excel les produits
+
+    /// <summary>
+    /// Imports multiple products from an Excel file.
+    /// </summary>
+    /// <param name="excelFile">The Excel file containing product data.</param>
+    /// <returns>A result object containing the import statistics and any errors encountered.</returns>
+    [HttpPost("bulk-import")]
+    [ProducesResponseType(typeof(BulkImportProductsCommandResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BadRequestObjectResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<BulkImportProductsCommandResult>> BulkImportProducts(IFormFile excelFile)
+    {
+        if (excelFile == null || excelFile.Length == 0)
+        {
+            return BadRequest("Excel file is required");
+        }
+
+        var command = new BulkImportProductsCommand { ExcelFile = excelFile };
+        var result = await sender.Send(command);
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Exports all products to an Excel file.
+    /// </summary>
+    /// <returns>An Excel file containing all products from the database.</returns>
+    [HttpGet("export")]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BadRequestObjectResult), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ExportProducts(
+        [FromQuery] int maxPrice = default,
+        [FromQuery] int minPrice = default,
+        [FromQuery] string?[] categories = null)
+    {
+        var command = new ExportProductsCommand(categories, maxPrice, minPrice);
+        var result = await sender.Send(command);
+        
+        return File(
+            result.ExcelFileBytes, 
+            result.ContentType, 
+            result.FileName);
+    }
 }

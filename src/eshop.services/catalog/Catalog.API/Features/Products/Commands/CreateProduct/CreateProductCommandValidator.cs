@@ -25,6 +25,6 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
         RuleFor(product => product.ImageFile).NotEmpty().WithMessage("ImageFile is required");
         RuleFor(product => product.Description).NotEmpty().WithMessage("Description is required");
         RuleFor(product => product.Price).GreaterThanOrEqualTo(1).WithMessage("Price must be greater than or equal to 1");
-
+        RuleFor(product => product.Stock).GreaterThanOrEqualTo(0).WithMessage("Stock must be greater than or equal to 0");
     }
 }
