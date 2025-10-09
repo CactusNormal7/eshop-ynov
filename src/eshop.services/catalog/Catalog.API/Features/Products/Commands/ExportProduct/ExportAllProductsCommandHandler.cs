@@ -24,6 +24,7 @@ public class ExportAllProductsCommandHandler(IDocumentSession documentSession)
         worksheet.Cells[1, 4].Value = "Stock";
         worksheet.Cells[1, 5].Value = "ImageFile";
         worksheet.Cells[1, 6].Value = "Categories";
+        // if the products evolve, just add the new colmun here
 
         using (var range = worksheet.Cells[1, 1, 1, 6])
         {

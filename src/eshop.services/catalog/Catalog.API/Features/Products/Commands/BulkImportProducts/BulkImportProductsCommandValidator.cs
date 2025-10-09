@@ -6,15 +6,18 @@ public class BulkImportProductsCommandValidator : AbstractValidator<BulkImportPr
 {
     public BulkImportProductsCommandValidator()
     {
+        // excelFile must not be null
         RuleFor(command => command.ExcelFile)
             .NotNull()
             .WithMessage("Excel file is required");
 
+        // we dont want empty file
         RuleFor(command => command.ExcelFile.Length)
             .GreaterThan(0)
             .When(command => command.ExcelFile != null)
             .WithMessage("Excel file cannot be empty");
 
+        // th e file must have a valid excel extension
         RuleFor(command => command.ExcelFile.FileName)
             .Must(fileName => fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase) ||
                               fileName.EndsWith(".xls", StringComparison.OrdinalIgnoreCase))
