@@ -16,17 +16,16 @@ public class ExportAllProductsCommandHandler(IDocumentSession documentSession)
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
         using var package = new ExcelPackage();
-        var worksheet = package.Workbook.Worksheets.Add("Produits");
+        var worksheet = package.Workbook.Worksheets.Add("Products");
 
-        worksheet.Cells[1, 1].Value = "ID";
-        worksheet.Cells[1, 2].Value = "Nom";
-        worksheet.Cells[1, 3].Value = "Description";
-        worksheet.Cells[1, 4].Value = "Prix";
-        worksheet.Cells[1, 5].Value = "Stock";
-        worksheet.Cells[1, 6].Value = "Image";
-        worksheet.Cells[1, 7].Value = "Catégories";
+        worksheet.Cells[1, 1].Value = "Name";
+        worksheet.Cells[1, 2].Value = "Description";
+        worksheet.Cells[1, 3].Value = "Price";
+        worksheet.Cells[1, 4].Value = "Stock";
+        worksheet.Cells[1, 5].Value = "ImageFile";
+        worksheet.Cells[1, 6].Value = "Categories";
 
-        using (var range = worksheet.Cells[1, 1, 1, 7])
+        using (var range = worksheet.Cells[1, 1, 1, 6])
         {
             range.Style.Font.Bold = true;
             range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
@@ -38,13 +37,12 @@ public class ExportAllProductsCommandHandler(IDocumentSession documentSession)
             var product = products[i];
             var row = i + 2;
 
-            worksheet.Cells[row, 1].Value = product.Id.ToString();
-            worksheet.Cells[row, 2].Value = product.Name;
-            worksheet.Cells[row, 3].Value = product.Description;
-            worksheet.Cells[row, 4].Value = product.Price;
-            worksheet.Cells[row, 5].Value = product.Stock;
-            worksheet.Cells[row, 6].Value = product.ImageFile;
-            worksheet.Cells[row, 7].Value = string.Join(", ", product.Categories);
+            worksheet.Cells[row, 1].Value = product.Name;
+            worksheet.Cells[row, 2].Value = product.Description;
+            worksheet.Cells[row, 3].Value = product.Price;
+            worksheet.Cells[row, 4].Value = product.Stock;
+            worksheet.Cells[row, 5].Value = product.ImageFile;
+            worksheet.Cells[row, 6].Value = string.Join(", ", product.Categories);
         }
 
         worksheet.Cells.AutoFitColumns();

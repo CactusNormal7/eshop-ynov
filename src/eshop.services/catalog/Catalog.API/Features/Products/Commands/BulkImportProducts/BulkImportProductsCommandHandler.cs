@@ -32,7 +32,7 @@ public class BulkImportProductsCommandHandler(IDocumentSession documentSession)
             }
 
             var headerRow = 1;
-            var expectedHeaders = new[] { "Name", "Description", "Price", "ImageFile", "Categories" };
+            var expectedHeaders = new[] { "Name", "Description", "Price","Stock", "ImageFile", "Categories" };
             var actualHeaders = new List<string>();
 
             for (int col = 1; col <= expectedHeaders.Length; col++)
