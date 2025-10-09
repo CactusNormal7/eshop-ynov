@@ -5,6 +5,6 @@ public sealed class ProductDto
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
-    public string? Category { get; set; }
+    public string[]? Categories{ get; set; }
     public decimal Price { get; set; }
 }

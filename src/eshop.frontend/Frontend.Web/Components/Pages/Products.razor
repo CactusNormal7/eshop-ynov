@@ -43,7 +43,12 @@ else
         {
             <tr>
                 <td>@p.Name</td>
-                <td>@p.Category</td>
+                <td>
+                    @foreach (var a in p.Categories)
+                    {
+                        <span>@a</span>
+                    }
+                </td>
                 <td class="text-end">@p.Price.ToString("C")</td>
             </tr>
         }
