@@ -1,6 +1,7 @@
 using Catalog.API.Features.Products.Commands.BulkImportProducts;
 using Catalog.API.Features.Products.Commands.CreateProduct;
 using Catalog.API.Features.Products.Commands.DeleteProduct;
+using Catalog.API.Features.Products.Commands.ExportProduct;
 using Catalog.API.Features.Products.Commands.UpdateProduct;
 using Catalog.API.Features.Products.Queries.GetProductById;
 using Catalog.API.Features.Products.Queries.GetProductsByPagination;
@@ -144,5 +145,23 @@ public class ProductsController(ISender sender) : ControllerBase
         var result = await sender.Send(command);
         
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Exports all products to an Excel file.
+    /// </summary>
+    /// <returns>An Excel file containing all products from the database.</returns>
+    [HttpGet("export-all")]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BadRequestObjectResult), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ExportAllProducts()
+    {
+        var command = new ExportAllProductsCommand();
+        var result = await sender.Send(command);
+        
+        return File(
+            result.ExcelFileBytes, 
+            result.ContentType, 
+            result.FileName);
     }
 }
