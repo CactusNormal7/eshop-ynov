@@ -14,7 +14,7 @@ public static class ApplyFilterExtension
     {
         if (categories is { Length: > 0 })
         {
-            // query = query.Where(x => x.Categories.Any(c => categories.Contains(c))).As<IMartenQueryable<Product>>();
+            query = query.Where(x => x.Categories.Any(c => categories.Contains(c))).As<IMartenQueryable<Product>>();
         }
 
         if (minPrice.HasValue)

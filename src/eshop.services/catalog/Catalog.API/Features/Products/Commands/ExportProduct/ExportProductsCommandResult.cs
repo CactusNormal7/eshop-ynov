@@ -1,6 +1,6 @@
 namespace Catalog.API.Features.Products.Commands.ExportProduct;
 
-public class ExportAllProductsCommandResult
+public class ExportProductsCommandResult
 {
     public required byte[] ExcelFileBytes { get; set; }
     public required string FileName { get; set; }

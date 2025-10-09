@@ -155,12 +155,15 @@ public class ProductsController(ISender sender) : ControllerBase
     /// Exports all products to an Excel file.
     /// </summary>
     /// <returns>An Excel file containing all products from the database.</returns>
-    [HttpGet("export-all")]
+    [HttpGet("export")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestObjectResult), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> ExportAllProducts()
+    public async Task<IActionResult> ExportProducts(
+        [FromQuery] int maxPrice = default,
+        [FromQuery] int minPrice = default,
+        [FromQuery] string?[] categories = null)
     {
-        var command = new ExportAllProductsCommand();
+        var command = new ExportProductsCommand(categories, maxPrice, minPrice);
         var result = await sender.Send(command);
         
         return File(
