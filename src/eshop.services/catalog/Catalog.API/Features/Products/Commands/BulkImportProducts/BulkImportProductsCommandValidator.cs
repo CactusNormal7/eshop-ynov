@@ -16,7 +16,7 @@ public class BulkImportProductsCommandValidator : AbstractValidator<BulkImportPr
             .WithMessage("Excel file cannot be empty");
 
         RuleFor(command => command.ExcelFile.FileName)
-            .Must(fileName => fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase) || 
+            .Must(fileName => fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase) ||
                               fileName.EndsWith(".xls", StringComparison.OrdinalIgnoreCase))
             .When(command => command.ExcelFile != null)
             .WithMessage("File must be an Excel file (.xlsx or .xls)");

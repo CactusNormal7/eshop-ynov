@@ -6,10 +6,11 @@ using OfficeOpenXml;
 
 namespace Catalog.API.Features.Products.Commands.BulkImportProducts;
 
-public class BulkImportProductsCommandHandler(IDocumentSession documentSession) : ICommandHandler<BulkImportProductsCommand, BulkImportProductsCommandResult>
+public class BulkImportProductsCommandHandler(IDocumentSession documentSession)
+    : ICommandHandler<BulkImportProductsCommand, BulkImportProductsCommandResult>
 {
-
-    public async Task<BulkImportProductsCommandResult> Handle(BulkImportProductsCommand request, CancellationToken cancellationToken)
+    public async Task<BulkImportProductsCommandResult> Handle(BulkImportProductsCommand request,
+        CancellationToken cancellationToken)
     {
         var result = new BulkImportProductsCommandResult();
         var importedProductIds = new List<Guid>();
@@ -21,7 +22,7 @@ public class BulkImportProductsCommandHandler(IDocumentSession documentSession) 
 
             using var stream = request.ExcelFile.OpenReadStream();
             using var package = new ExcelPackage(stream);
-            
+
             var worksheet = package.Workbook.Worksheets.FirstOrDefault();
             if (worksheet == null)
             {
@@ -33,7 +34,7 @@ public class BulkImportProductsCommandHandler(IDocumentSession documentSession) 
             var headerRow = 1;
             var expectedHeaders = new[] { "Name", "Description", "Price", "ImageFile", "Categories" };
             var actualHeaders = new List<string>();
-            
+
             for (int col = 1; col <= expectedHeaders.Length; col++)
             {
                 actualHeaders.Add(worksheet.Cells[headerRow, col].Text?.Trim() ?? "");
@@ -41,7 +42,8 @@ public class BulkImportProductsCommandHandler(IDocumentSession documentSession) 
 
             if (!expectedHeaders.SequenceEqual(actualHeaders, StringComparer.OrdinalIgnoreCase))
             {
-                errors.Add($"Invalid Excel format. Expected headers: {string.Join(", ", expectedHeaders)}. Found: {string.Join(", ", actualHeaders)}");
+                errors.Add(
+                    $"Invalid Excel format. Expected headers: {string.Join(", ", expectedHeaders)}. Found: {string.Join(", ", actualHeaders)}");
                 result.Errors = errors;
                 return result;
             }
@@ -62,7 +64,9 @@ public class BulkImportProductsCommandHandler(IDocumentSession documentSession) 
                     }
 
                     var existingProduct = await documentSession.Query<Product>()
-                        .FirstOrDefaultAsync(x => x.Name.Equals(product.Name, StringComparison.CurrentCultureIgnoreCase), cancellationToken);
+                        .FirstOrDefaultAsync(
+                            x => x.Name.Equals(product.Name, StringComparison.CurrentCultureIgnoreCase),
+                            cancellationToken);
 
                     if (existingProduct != null)
                     {
@@ -107,12 +111,13 @@ public class BulkImportProductsCommandHandler(IDocumentSession documentSession) 
             var imageFile = worksheet.Cells[row, 4].Value?.ToString()?.Trim();
             var categoriesText = worksheet.Cells[row, 5].Value?.ToString()?.Trim();
 
-            Console.WriteLine($"Row {row}: Name='{name}', Description='{description}', Price='{priceValue}', Image='{imageFile}', Categories='{categoriesText}'");
+            Console.WriteLine(
+                $"Row {row}: Name='{name}', Description='{description}', Price='{priceValue}', Image='{imageFile}', Categories='{categoriesText}'");
 
-            if (string.IsNullOrWhiteSpace(name) || 
-                string.IsNullOrWhiteSpace(description) || 
-                priceValue == null || 
-                string.IsNullOrWhiteSpace(imageFile) || 
+            if (string.IsNullOrWhiteSpace(name) ||
+                string.IsNullOrWhiteSpace(description) ||
+                priceValue == null ||
+                string.IsNullOrWhiteSpace(imageFile) ||
                 string.IsNullOrWhiteSpace(categoriesText))
             {
                 Console.WriteLine($"Row {row}: Validation failed - missing required fields");
