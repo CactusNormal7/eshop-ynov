@@ -47,8 +47,8 @@ public class ProductsController(ISender sender) : ControllerBase
         // TODO
         if (string.IsNullOrWhiteSpace(category))
             return BadRequest("Category is required");
-        
-        var result = await sender.Send(new ());
+
+        var result = await sender.Send(new());
         return Ok();
     }
 
@@ -72,9 +72,13 @@ public class ProductsController(ISender sender) : ControllerBase
     [ProducesResponseType(typeof(BuildingBlocks.Pagination.PaginatedResult<Product>), StatusCodes.Status200OK)]
     public async Task<ActionResult<BuildingBlocks.Pagination.PaginatedResult<Product>>> GetProducts(
         [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+        [FromQuery] int pageSize = 10,
+        [FromQuery] int maxPrice = 0,
+        [FromQuery] int minPrice = 0,
+        [FromQuery] string[] categories = null)
     {
-        var result = await sender.Send(new GetProductsByPaginationQuery(pageNumber, pageSize));
+        var result =
+            await sender.Send(new GetProductsByPaginationQuery(pageNumber, pageSize, categories, maxPrice, minPrice));
         return Ok(result.Products);
     }
 
@@ -137,7 +141,7 @@ public class ProductsController(ISender sender) : ControllerBase
 
         var command = new BulkImportProductsCommand { ExcelFile = excelFile };
         var result = await sender.Send(command);
-        
+
         return Ok(result);
     }
 }

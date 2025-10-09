@@ -1,3 +1,5 @@
+using Catalog.API.Extensions;
+
 namespace Catalog.API.Features.Products.Queries.GetProductsByPagination;
 
 using BuildingBlocks.CQRS;
@@ -12,8 +14,10 @@ public class GetProductByPaginationQueryHandler(IDocumentSession documentSession
     public Task<GetProductByPaginationQueryResult> Handle(GetProductsByPaginationQuery request,
         CancellationToken cancellationToken)
     {
-        // Create a paged list using Marten paging
-        var pagedList = documentSession.Query<Product>()
+        var filteredDb = documentSession.Query<Product>();
+        filteredDb = filteredDb.ApplyFilterOnProduct(request.Categories, request.MaxPrice, request.MinPrice);        
+
+        var pagedList = filteredDb
             .ToPagedList(request.PageIndex, request.PageSize);
 
         var result = new PaginatedResult<Product>(
