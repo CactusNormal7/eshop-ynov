@@ -34,6 +34,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eshop.frontend", "eshop.fro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frontend.Web", "eshop.frontend\Frontend.Web\Frontend.Web.csproj", "{C87C74A5-9394-467C-887A-68ABEF78B640}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basket.API", "eshop.services\basket\Basket.API\Basket.API.csproj", "{A285DD3F-89A6-429F-8D53-BBF08BB653C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,7 @@ Global
 		{545B5213-3E49-4315-B6D7-487DCAF12138} = {D7E7EC50-279D-4882-9651-A4EEFEFFAC53}
 		{1259ABFA-EC5E-429D-A81F-7993E7CB6E09} = {9311966F-6E39-43C6-808E-58D8B4E19BB8}
 		{C87C74A5-9394-467C-887A-68ABEF78B640} = {2158B67F-3922-4A73-A454-2AD2BF10CA40}
+		{A285DD3F-89A6-429F-8D53-BBF08BB653C0} = {24D3782D-E953-4439-A1DE-3A150D0EBF2D}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{545B5213-3E49-4315-B6D7-487DCAF12138}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -62,5 +65,9 @@ Global
 		{C87C74A5-9394-467C-887A-68ABEF78B640}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C87C74A5-9394-467C-887A-68ABEF78B640}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C87C74A5-9394-467C-887A-68ABEF78B640}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A285DD3F-89A6-429F-8D53-BBF08BB653C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A285DD3F-89A6-429F-8D53-BBF08BB653C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A285DD3F-89A6-429F-8D53-BBF08BB653C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A285DD3F-89A6-429F-8D53-BBF08BB653C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
