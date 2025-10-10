@@ -1,3 +1,4 @@
+using Basket.API.Features.Baskets.Commands.AddProductToBasket;
 using Basket.API.Features.Baskets.Commands.CreateBasket;
 using Basket.API.Features.Baskets.Commands.DeleteBasket;
 using Basket.API.Features.Baskets.Commands.UpdateBasket;
@@ -74,7 +75,18 @@ public class BasketsController(ISender sender) : ControllerBase
         var result = await sender.Send(new DeleteBasketCommand(userName));
         return Ok(result.IsSuccess);
     }
-
+    
+    [HttpPost("add-product")]
+    [ProducesResponseType(typeof(AddProductToBasketCommandResult), StatusCodes.Status200OK)]
+    public async Task<ActionResult<CreateBasketCommandResult>> AddProductToBasket(string userName, [FromBody] AddProductToBasketCommand request)
+    {
+        var command = request with { UserName = userName };
+        var result = await sender.Send(command);
+        return CreatedAtAction(nameof(AddProductToBasket), new { userName }, result);
+    }
+    
+    // TODO Update basket product quantity
+    
     //TODO Delete item in user basket
     
 }
