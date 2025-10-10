@@ -25,7 +25,12 @@ public class Product
     /// Gets or sets the price of the product.
     /// </summary>
     public decimal Price { get; set; }
-
+    
+    /// <summary>
+    /// Gets or sets the amount of item lefts
+    /// </summary>
+    public int Stock { get; set; }
+    
     /// <summary>
     /// Gets or sets the name of the image file associated with the product.
     /// </summary>

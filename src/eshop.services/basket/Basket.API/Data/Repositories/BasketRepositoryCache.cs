@@ -1,7 +1,8 @@
-
 using Basket.API.Extensions;
 using Basket.API.Models;
 using Microsoft.Extensions.Caching.Distributed;
+using System;
+using System.Text.Json;
 
 namespace Basket.API.Data.Repositories;
 
@@ -18,6 +19,15 @@ public class BasketRepositoryCache(IBasketRepository repository, IDistributedCac
     /// Ensures consistency and avoids key collisions by appending user-related identifiers.
     /// </summary>
     private const string PrefixKey = "basket";
+    
+    /// <summary>
+    /// Default expiration options for cached items.
+    /// </summary>
+    private static readonly DistributedCacheEntryOptions CacheOptions = new DistributedCacheEntryOptions
+    {
+        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30),
+        SlidingExpiration = TimeSpan.FromMinutes(5)
+    };
 
     /// <summary>
     /// Generates a unique cache key for storing and retrieving user-specific basket data.
@@ -56,10 +66,20 @@ public class BasketRepositoryCache(IBasketRepository repository, IDistributedCac
         var cachedBasket = await cache.GetObjectAsync<ShoppingCart>(cacheKey, cancellationToken);
 
         if (cachedBasket != null)
+        {
+            await cache.RefreshAsync(cacheKey, cancellationToken);
             return cachedBasket;
+        }
             
         var basket = await repository.GetBasketByUserNameAsync(userName, cancellationToken);
-        await cache.SetObjectAsync(cacheKey, basket, cancellationToken);
+
+        // Store in cache with expiration options
+        if (basket != null)
+        {
+            var bytes = JsonSerializer.SerializeToUtf8Bytes(basket);
+            await cache.SetAsync(cacheKey, bytes, CacheOptions, cancellationToken);
+        }
+
         return basket;
     }
 
@@ -74,7 +94,29 @@ public class BasketRepositoryCache(IBasketRepository repository, IDistributedCac
     {
         var createdBasket = await repository.CreateBasketAsync(basket, cancellationToken);
         var cacheKey = GenerateKey(basket.UserName);
-        await cache.SetObjectAsync(cacheKey, createdBasket, cancellationToken);
+
+        // Store in cache with expiration options
+        if (createdBasket != null)
+        {
+            var bytes = JsonSerializer.SerializeToUtf8Bytes(createdBasket);
+            await cache.SetAsync(cacheKey, bytes, CacheOptions, cancellationToken);
+        }
+
         return createdBasket;
+    }
+
+    /// <summary>
+    /// Updates an existing shopping cart and stores it in the underlying repository and distributed cache.
+    /// </summary>
+    /// <param name="basket">The shopping cart to be updated.</param>
+    /// <param name="cancellationToken">An optional token to monitor for cancellation requests.</param>
+    /// <returns>The updated shopping cart.</returns>
+    public async Task<ShoppingCart> UpdateBasketAsync(ShoppingCart basket,
+        CancellationToken cancellationToken = default)
+    {
+        var updatedBasket = await repository.UpdateBasketAsync(basket, cancellationToken);
+        var cacheKey = GenerateKey(basket.UserName);
+        await cache.SetObjectAsync(cacheKey, updatedBasket, cancellationToken);
+        return updatedBasket;
     }
 }

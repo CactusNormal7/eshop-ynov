@@ -1,0 +1,14 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>eShop Front Page</h1>
+
+<p class="lead">Welcome to the eShop demo powered by ASP.NET Core and Blazor.</p>
+
+<div class="list-group mb-4" style="max-width: 640px;">
+    <a class="list-group-item list-group-item-action" href="products">Browse Products (Blazor)</a>
+    <a class="list-group-item list-group-item-action" href="/swagger" target="_blank" rel="noopener">Catalog API Swagger (requires API running)</a>
+</div>
+
+<p class="text-muted">Tip: If product loading fails, ensure the Catalog.API is running and that the Frontend is configured to reach it (CATALOG_API_BASE_URL env var or appsettings.json).</p>
