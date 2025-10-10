@@ -1,5 +1,6 @@
 using Basket.API.Features.Baskets.Commands.CreateBasket;
 using Basket.API.Features.Baskets.Commands.DeleteBasket;
+using Basket.API.Features.Baskets.Commands.UpdateBasket;
 using Basket.API.Features.Baskets.Queries.GetBasketByUserName;
 using Basket.API.Models;
 using MediatR;
@@ -14,7 +15,7 @@ namespace Basket.API.Controllers;
 [ApiController]
 [Route("[controller]/{userName}")]
 [Produces("application/json")]
-public class BasketsController (ISender sender) : ControllerBase
+public class BasketsController(ISender sender) : ControllerBase
 {
     /// <summary>
     /// Retrieves the shopping basket for the specified user.
@@ -38,10 +39,27 @@ public class BasketsController (ISender sender) : ControllerBase
     /// <returns>The result of the create basket operation, including success status and associated username.</returns>
     [HttpPost]
     [ProducesResponseType(typeof(CreateBasketCommandResult), StatusCodes.Status201Created)]
-    public async Task<ActionResult<CreateBasketCommandResult>> CreateBasket(string userName, [FromBody] CreateBasketCommand request)
+    public async Task<ActionResult<CreateBasketCommandResult>> CreateBasket(string userName,
+        [FromBody] CreateBasketCommand request)
     {
         var result = await sender.Send(request);
         return CreatedAtAction(nameof(GetBasketByUserName), new { userName }, result);
+    }
+
+    /// <summary>
+    /// Updates the shopping basket for the specified user.
+    /// </summary>
+    /// <param name="userName">The username for whom the shopping basket is to be updated.</param>
+    /// <param name="items">The items to update in the shopping basket.</param>
+    [HttpPut]
+    [ProducesResponseType(typeof(UpdateBasketCommandResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(NotFoundObjectResult), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<UpdateBasketCommandResult>> UpdateBasket(string userName,
+        [FromBody] IEnumerable<ShoppingCartItem> items)
+    {
+        var command = new UpdateBasketCommand(userName, items);
+        var result = await sender.Send(command);
+        return Ok(result);
     }
 
     /// <summary>
@@ -57,9 +75,6 @@ public class BasketsController (ISender sender) : ControllerBase
         var result = await sender.Send(new DeleteBasketCommand(userName));
         return Ok(result.IsSuccess);
     }
-    
-    // TODO Update basket product quantity
-    
+
     //TODO Delete item in user basket
-    
 }

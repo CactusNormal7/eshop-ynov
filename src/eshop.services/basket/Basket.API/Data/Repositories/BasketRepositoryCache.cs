@@ -1,4 +1,3 @@
-
 using Basket.API.Extensions;
 using Basket.API.Models;
 using Microsoft.Extensions.Caching.Distributed;
@@ -57,7 +56,7 @@ public class BasketRepositoryCache(IBasketRepository repository, IDistributedCac
 
         if (cachedBasket != null)
             return cachedBasket;
-            
+
         var basket = await repository.GetBasketByUserNameAsync(userName, cancellationToken);
         await cache.SetObjectAsync(cacheKey, basket, cancellationToken);
         return basket;
@@ -76,5 +75,20 @@ public class BasketRepositoryCache(IBasketRepository repository, IDistributedCac
         var cacheKey = GenerateKey(basket.UserName);
         await cache.SetObjectAsync(cacheKey, createdBasket, cancellationToken);
         return createdBasket;
+    }
+
+    /// <summary>
+    /// Updates an existing shopping cart and stores it in the underlying repository and distributed cache.
+    /// </summary>
+    /// <param name="basket">The shopping cart to be updated.</param>
+    /// <param name="cancellationToken">An optional token to monitor for cancellation requests.</param>
+    /// <returns>The updated shopping cart.</returns>
+    public async Task<ShoppingCart> UpdateBasketAsync(ShoppingCart basket,
+        CancellationToken cancellationToken = default)
+    {
+        var updatedBasket = await repository.UpdateBasketAsync(basket, cancellationToken);
+        var cacheKey = GenerateKey(basket.UserName);
+        await cache.SetObjectAsync(cacheKey, updatedBasket, cancellationToken);
+        return updatedBasket;
     }
 }
