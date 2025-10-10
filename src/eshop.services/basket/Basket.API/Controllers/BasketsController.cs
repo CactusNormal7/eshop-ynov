@@ -39,8 +39,7 @@ public class BasketsController(ISender sender) : ControllerBase
     /// <returns>The result of the create basket operation, including success status and associated username.</returns>
     [HttpPost]
     [ProducesResponseType(typeof(CreateBasketCommandResult), StatusCodes.Status201Created)]
-    public async Task<ActionResult<CreateBasketCommandResult>> CreateBasket(string userName,
-        [FromBody] CreateBasketCommand request)
+    public async Task<ActionResult<CreateBasketCommandResult>> CreateBasket(string userName, [FromBody] CreateBasketCommand request)
     {
         var result = await sender.Send(request);
         return CreatedAtAction(nameof(GetBasketByUserName), new { userName }, result);
@@ -77,4 +76,5 @@ public class BasketsController(ISender sender) : ControllerBase
     }
 
     //TODO Delete item in user basket
+    
 }
