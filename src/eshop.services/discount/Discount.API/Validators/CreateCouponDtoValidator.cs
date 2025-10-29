@@ -71,7 +71,26 @@ public class UpdateCouponDtoValidator : AbstractValidator<UpdateCouponDto>
         RuleFor(x => x.Id)
             .GreaterThan(0).WithMessage("L'ID doit être positif");
 
-        Include(new CreateCouponDtoValidator());
+        RuleFor(x => x.Description)
+            .NotEmpty().WithMessage("La description est requise")
+            .MaximumLength(500).WithMessage("La description ne peut pas dépasser 500 caractères");
+
+        RuleFor(x => x.DiscountType)
+            .NotEmpty().WithMessage("Le type de réduction est requis")
+            .Must(BeValidDiscountType).WithMessage("Le type de réduction doit être: FixedAmount, Percentage, FixedAmountWithCode, ou Tiered");
+
+        RuleFor(x => x.Amount)
+            .GreaterThanOrEqualTo(0).WithMessage("Le montant doit être positif");
+
+        RuleFor(x => x.Percentage)
+            .Must(percentage => !percentage.HasValue || (percentage.Value >= 0 && percentage.Value <= 100))
+            .WithMessage("Le pourcentage doit être entre 0 et 100");
+    }
+    
+    private bool BeValidDiscountType(string discountType)
+    {
+        var validTypes = new[] { "FixedAmount", "Percentage", "FixedAmountWithCode", "Tiered" };
+        return validTypes.Contains(discountType, StringComparer.OrdinalIgnoreCase);
     }
 }
 

@@ -3,6 +3,9 @@ using Discount.Grpc.Models;
 using Grpc.Core;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+// Alias pour éviter les conflits entre enums protobuf et modèles C#
+using ProtobufDiscountType = Discount.Grpc.DiscountType;
+using ProtobufCouponStatus = Discount.Grpc.CouponStatus;
 
 namespace Discount.Grpc.Services;
 
@@ -45,8 +48,8 @@ public class DiscountServiceServer(DiscountContext dbContext, ILogger<DiscountSe
                 ProductName = request.ProductName,
                 Amount = 0,
                 Description = "No Discount",
-                DiscountType = (DiscountProtoService.DiscountType)(int)Models.DiscountType.FixedAmount,
-                Status = (DiscountProtoService.CouponStatus)(int)Models.CouponStatus.Active
+                DiscountType = ProtobufDiscountType.FixedAmount,
+                Status = ProtobufCouponStatus.Active
             };
         }
         
@@ -88,7 +91,7 @@ public class DiscountServiceServer(DiscountContext dbContext, ILogger<DiscountSe
         
         if (!request.IncludeInactive)
         {
-            query = query.Where(x => x.Status == CouponStatus.Active || x.Status == CouponStatus.Upcoming);
+            query = query.Where(x => x.Status == Models.CouponStatus.Active || x.Status == Models.CouponStatus.Upcoming);
         }
         
         var coupons = await query.ToListAsync();
@@ -332,7 +335,7 @@ public class DiscountServiceServer(DiscountContext dbContext, ILogger<DiscountSe
         
         var availableCoupons = await dbContext.Coupons
             .Where(x => x.IsAutomatic &&
-                       (x.Status == CouponStatus.Active || x.Status == CouponStatus.Upcoming) &&
+                       (x.Status == Models.CouponStatus.Active || x.Status == Models.CouponStatus.Upcoming) &&
                        (string.IsNullOrEmpty(x.ProductName) || allProductNames.Contains(x.ProductName) ||
                         (!string.IsNullOrEmpty(x.Category) && allCategories.Contains(x.Category))))
             .ToListAsync();

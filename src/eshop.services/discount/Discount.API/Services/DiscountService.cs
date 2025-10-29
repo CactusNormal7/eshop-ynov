@@ -242,7 +242,7 @@ public class DiscountService : IDiscountService
         };
         
         // Map discount type
-        coupon.DiscountType = Enum.Parse<DiscountProtoService.DiscountType>(dto.DiscountType, true);
+        coupon.DiscountType = Enum.Parse<Discount.Grpc.DiscountType>(dto.DiscountType, true);
         
         // Map dates
         if (dto.StartDate.HasValue)
@@ -265,14 +265,14 @@ public class DiscountService : IDiscountService
             Amount = dto.Amount,
             Percentage = dto.Percentage ?? 0,
             MinimumAmount = dto.MinimumAmount ?? 0,
-            Status = Enum.Parse<DiscountProtoService.CouponStatus>(dto.Status, true),
+            Status = Enum.Parse<Discount.Grpc.CouponStatus>(dto.Status, true),
             IsStackable = dto.IsStackable,
             MaxStackablePercentage = dto.MaxStackablePercentage ?? 0,
             RemainingUses = dto.RemainingUses,
             IsAutomatic = dto.IsAutomatic
         };
         
-        coupon.DiscountType = Enum.Parse<DiscountProtoService.DiscountType>(dto.DiscountType, true);
+        coupon.DiscountType = Enum.Parse<Discount.Grpc.DiscountType>(dto.DiscountType, true);
         
         if (dto.StartDate.HasValue)
             coupon.StartDate = new DateTimeOffset(dto.StartDate.Value).ToUnixTimeSeconds();
