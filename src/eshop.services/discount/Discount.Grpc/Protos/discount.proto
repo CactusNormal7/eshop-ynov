@@ -9,9 +9,16 @@ service DiscountProtoService {
   
   //Discount CRUD opérations
   rpc GetDiscount (GetDiscountRequest) returns (CouponModel);
+  rpc GetDiscountByCode (GetDiscountByCodeRequest) returns (CouponModel);
+  rpc GetDiscountsByCategory (GetDiscountsByCategoryRequest) returns (CouponListResponse);
   rpc CreateDiscount (CreateDiscountRequest) returns (CouponModel);
   rpc UpdateDiscount (UpdateDiscountRequest) returns (CouponModel);
   rpc DeleteDiscount (DeleteDiscountRequest) returns (DeleteDiscountResponse);
+  
+  // Nouvelles méthodes pour la gestion avancée
+  rpc ValidateDiscountCode (ValidateDiscountCodeRequest) returns (ValidateDiscountCodeResponse);
+  rpc ApplyDiscount (ApplyDiscountRequest) returns (ApplyDiscountResponse);
+  rpc CalculateTotalDiscount (CalculateTotalDiscountRequest) returns (CalculateTotalDiscountResponse);
   
 }
 
@@ -19,11 +26,90 @@ message GetDiscountRequest {
   string productName = 1;
 }
 
+message GetDiscountByCodeRequest {
+  string code = 1;
+}
+
+message GetDiscountsByCategoryRequest {
+  string category = 1;
+  bool includeInactive = 2;
+}
+
+message ValidateDiscountCodeRequest {
+  string code = 1;
+  double cartTotal = 2;
+}
+
+message ValidateDiscountCodeResponse {
+  bool isValid = 1;
+  string message = 2;
+  CouponModel coupon = 3;
+}
+
+message ApplyDiscountRequest {
+  string productName = 1;
+  double originalPrice = 2;
+  string discountCode = 3;
+  double cartTotal = 4;
+}
+
+message ApplyDiscountResponse {
+  double discountedPrice = 1;
+  double discountAmount = 2;
+  double discountPercentage = 3;
+  repeated CouponModel appliedCoupons = 4;
+}
+
+message CalculateTotalDiscountRequest {
+  repeated CartItem items = 1;
+  string discountCode = 2;
+  double cartTotal = 3;
+}
+
+message CartItem {
+  string productName = 1;
+  double price = 2;
+  int32 quantity = 3;
+  string category = 4;
+}
+
+message CalculateTotalDiscountResponse {
+  double totalDiscount = 1;
+  double finalTotal = 2;
+  repeated CouponModel appliedCoupons = 3;
+}
+
 message CouponModel {
   int32 id = 1;
   string productName = 2;
-  string description = 3;
-  double amount = 4;
+  string category = 3;
+  string description = 4;
+  string code = 5;
+  DiscountType discountType = 6;
+  double amount = 7;
+  double percentage = 8;
+  double minimumAmount = 9;
+  int64 startDate = 10; // Unix timestamp
+  int64 endDate = 11; // Unix timestamp
+  CouponStatus status = 12;
+  bool isStackable = 13;
+  double maxStackablePercentage = 14;
+  int32 remainingUses = 15;
+  bool isAutomatic = 16;
+}
+
+enum DiscountType {
+  FIXED_AMOUNT = 0;
+  PERCENTAGE = 1;
+  FIXED_AMOUNT_WITH_CODE = 2;
+  TIERED = 3;
+}
+
+enum CouponStatus {
+  ACTIVE = 0;
+  EXPIRED = 1;
+  DISABLED = 2;
+  UPCOMING = 3;
 }
 
 message CreateDiscountRequest {
@@ -40,4 +126,8 @@ message DeleteDiscountRequest {
 
 message DeleteDiscountResponse {
   bool success = 1;
+}
+
+message CouponListResponse {
+  repeated CouponModel coupons = 1;
 }

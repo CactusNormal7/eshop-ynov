@@ -31,19 +31,64 @@ public class CreateBasketCommandHandler(IBasketRepository repository, DiscountPr
     }
 
     /// <summary>
-    /// Applies a discount to each item in the specified shopping cart.
+    /// Applies discounts to items in the specified shopping cart using the new discount calculation service.
+    /// Supports percentage discounts, cumulative discounts, and automatic discounts.
     /// </summary>
     /// <param name="cart">The shopping cart containing the items to which the discount will be applied.</param>
     /// <param name="cancellationToken">A token to observe while waiting for the operation to complete.</param>
     /// <returns>A task that represents the asynchronous operation of applying discounts to the items.</returns>
     private async Task ApplyDiscountToItemAsync(ShoppingCart cart, CancellationToken cancellationToken)
     {
-        foreach (var item in cart.Items)
+        var cartTotal = cart.Total;
+        
+        // Préparer les items pour le calcul total de réduction
+        var cartItems = cart.Items.Select(item => new CartItem
         {
-            var coupon = await discountProtoServiceClient.GetDiscountAsync(new GetDiscountRequest
-                { ProductName = item.ProductName }, cancellationToken: cancellationToken);
+            ProductName = item.ProductName,
+            Price = (double)item.Price,
+            Quantity = item.Quantity,
+            Category = string.Empty // Peut être étendu avec la catégorie du produit
+        }).ToList();
+        
+        // Calculer la réduction totale pour tous les items du panier
+        var calculateRequest = new CalculateTotalDiscountRequest
+        {
+            CartTotal = (double)cartTotal
+        };
+        calculateRequest.Items.AddRange(cartItems);
+        
+        try
+        {
+            var discountResponse = await discountProtoServiceClient.CalculateTotalDiscountAsync(
+                calculateRequest, 
+                cancellationToken: cancellationToken);
             
-            item.Price -= (decimal)coupon.Amount;
+            // Appliquer les réductions calculées par le service de discount
+            // Le service gère déjà le cumul et la limitation à 30%
+            var totalDiscount = (decimal)discountResponse.TotalDiscount;
+            
+            // Répartir la réduction proportionnellement entre les items
+            if (cartTotal > 0 && totalDiscount > 0)
+            {
+                foreach (var item in cart.Items)
+                {
+                    var itemSubtotal = item.Price * item.Quantity;
+                    var itemDiscountRatio = itemSubtotal / cartTotal;
+                    var itemDiscount = totalDiscount * itemDiscountRatio;
+                    
+                    // Appliquer la réduction au prix unitaire
+                    item.Price -= itemDiscount / item.Quantity;
+                    
+                    // Garantir que le prix ne devienne pas négatif
+                    if (item.Price < 0)
+                        item.Price = 0;
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // En cas d'erreur, continuer sans appliquer de réduction
+            // Log l'erreur si nécessaire
         }
     }
 }
