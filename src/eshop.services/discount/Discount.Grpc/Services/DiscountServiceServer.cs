@@ -100,33 +100,81 @@ public class DiscountServiceServer(DiscountContext dbContext, ILogger<DiscountSe
     }
 
     /// <summary>
-    /// Deletes a discount for a specified product based on the provided coupon details.
+    /// Deletes a discount for a specified product based on the provided ID.
     /// </summary>
-    /// <param name="request">The request containing the details of the coupon to be deleted, including the product name or ID.</param>
+    /// <param name="request">The request containing the ID of the coupon to be deleted.</param>
     /// <param name="context">The gRPC server call context.</param>
     /// <returns>
     /// Returns a <see cref="DeleteDiscountResponse"/> indicating whether the discount was successfully deleted.
     /// </returns>
     /// <exception cref="RpcException">
-    /// Thrown if the provided coupon is null, or if no matching discount is found for the specified product name or ID.
+    /// Thrown if no matching discount is found for the specified ID.
     /// </exception>
     public override async Task<DeleteDiscountResponse> DeleteDiscount(DeleteDiscountRequest request,
         ServerCallContext context)
     {
-        if (request.Coupon is null)
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "Coupon is null"));
-
-        logger.LogInformation("Deleting discount for {ProductName}", request.Coupon.ProductName);
+        logger.LogInformation("Deleting discount with ID {Id}", request.Id);
         
-        var coupon = await dbContext.Coupons.FirstOrDefaultAsync(x => x.ProductName == request.Coupon.ProductName 
-                                                                      || x.Id == request.Coupon.Id);
+        var coupon = await dbContext.Coupons.FirstOrDefaultAsync(x => x.Id == request.Id);
         if(coupon is null)
-            throw new RpcException(new Status(StatusCode.NotFound, $"Coupon with name {request.Coupon.ProductName} " +
-                                                                   $" or Id {request.Coupon.Id} not found"));
+            throw new RpcException(new Status(StatusCode.NotFound, $"Coupon with Id {request.Id} not found"));
+        
         dbContext.Coupons.Remove(coupon);
         await dbContext.SaveChangesAsync();
         logger.LogInformation("Discount deleted for {ProductName}", coupon.ProductName);
         
         return new DeleteDiscountResponse(){Success = true};
+    }
+    
+    /// <summary>
+    /// Retrieves code details for a given ID from the database.
+    /// </summary>
+    /// <param name="request">The request containing the ID to fetch the code for.</param>
+    /// <param name="context">The gRPC server call context.</param>
+    /// <returns>
+    /// Returns a <see cref="CodeModel"/> containing the code details for the specified ID.
+    /// </returns>
+    /// <exception cref="RpcException">
+    /// Thrown if no code is found for the specified ID.
+    /// </exception>
+    public override async Task<CodeModel> GetCode(GetCodeRequest request, ServerCallContext context)
+    {
+        logger.LogInformation("Retrieving code with ID {Id}", request.Id);
+        
+        var code = await dbContext.Codes.FirstOrDefaultAsync(x => x.Id == request.Id);
+        
+        if (code == null)
+            throw new RpcException(new Status(StatusCode.NotFound, $"Code with ID {request.Id} not found"));
+        
+        logger.LogInformation("Code retrieved with ID {Id}: Amount={Amount}, Percentage={Percentage}", 
+            code.Id, code.Amount, code.Percentage);
+        
+        return code.Adapt<CodeModel>();
+    }
+
+    /// <summary>
+    /// Creates a new code and stores it in the database.
+    /// </summary>
+    /// <param name="request">The request containing the details of the new code to create, including the code information.</param>
+    /// <param name="context">The gRPC server call context.</param>
+    /// <returns>
+    /// Returns a <see cref="CodeModel"/> representing the newly created code.
+    /// </returns>
+    /// <exception cref="RpcException">
+    /// Thrown if the request's code information is null.
+    /// </exception>
+    public override async Task<CodeModel> CreateCode(CreateCodeRequest request, ServerCallContext context)
+    {
+        if (request.Code is null)
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Code is null"));
+        
+        var code = request.Code.Adapt<Code>();
+        logger.LogInformation("Creating new code with Amount={Amount}, Percentage={Percentage}", 
+            code.Amount, code.Percentage);
+        await dbContext.Codes.AddAsync(code);
+        await dbContext.SaveChangesAsync();
+        logger.LogInformation("Code created with ID {Id}: Amount={Amount}, Percentage={Percentage}", 
+            code.Id, code.Amount, code.Percentage);
+        return code.Adapt<CodeModel>();
     }
 }

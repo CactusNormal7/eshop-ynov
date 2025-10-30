@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Discount.Grpc.Migrations
 {
     [DbContext(typeof(DiscountContext))]
-    [Migration("20251030134753_AddDiscountCodeTable")]
-    partial class AddDiscountCodeTable
+    [Migration("20251030144120_addCodeTable")]
+    partial class addCodeTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,10 +30,6 @@ namespace Discount.Grpc.Migrations
 
                     b.Property<double>("Percentage")
                         .HasColumnType("REAL");
-
-                    b.Property<string>("Rules")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 

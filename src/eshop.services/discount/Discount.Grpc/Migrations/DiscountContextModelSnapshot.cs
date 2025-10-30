@@ -28,10 +28,6 @@ namespace Discount.Grpc.Migrations
                     b.Property<double>("Percentage")
                         .HasColumnType("REAL");
 
-                    b.Property<string>("Rules")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.ToTable("Codes");

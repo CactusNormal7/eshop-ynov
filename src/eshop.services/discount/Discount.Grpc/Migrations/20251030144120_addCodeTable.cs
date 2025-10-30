@@ -5,7 +5,7 @@
 namespace Discount.Grpc.Migrations
 {
     /// <inheritdoc />
-    public partial class AddDiscountCodeTable : Migration
+    public partial class addCodeTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,7 +16,6 @@ namespace Discount.Grpc.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Rules = table.Column<string>(type: "TEXT", nullable: false),
                     Amount = table.Column<double>(type: "REAL", nullable: false),
                     Percentage = table.Column<double>(type: "REAL", nullable: false)
                 },
