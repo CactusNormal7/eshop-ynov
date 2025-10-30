@@ -43,7 +43,7 @@ public class CreateBasketCommandHandler(IBasketRepository repository, DiscountPr
             var coupon = await discountProtoServiceClient.GetDiscountAsync(new GetDiscountRequest
                 { ProductName = item.ProductName }, cancellationToken: cancellationToken);
             
-            item.Price -= (decimal)coupon.Amount;
+            item.Price -= item.Price * ((decimal)coupon.Percentage / 100);
         }
     }
 }
