@@ -6,6 +6,7 @@ namespace Discount.Grpc.Data;
 public sealed class DiscountContext(DbContextOptions<DiscountContext> options) : DbContext(options)
 {
     public DbSet<Coupon> Coupons { get; set; }
+    public DbSet<Code> Codes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
