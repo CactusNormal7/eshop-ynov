@@ -24,7 +24,6 @@ message CouponModel {
   string productName = 2;
   string description = 3;
   double amount = 4;
-  double percentage = 5;
 }
 
 message CreateDiscountRequest {

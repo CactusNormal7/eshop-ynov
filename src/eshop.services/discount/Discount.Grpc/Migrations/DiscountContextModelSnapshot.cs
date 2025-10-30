@@ -25,9 +25,6 @@ namespace Discount.Grpc.Migrations
                     b.Property<double>("Amount")
                         .HasColumnType("REAL");
 
-                    b.Property<double>("Percentage")
-                        .HasColumnType("REAL");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -44,14 +41,14 @@ namespace Discount.Grpc.Migrations
                         new
                         {
                             Id = 1,
-                            Percentage = 50.0,
+                            Amount = 150.0,
                             Description = "IPhone X New",
                             ProductName = "IPhone X"
                         },
                         new
                         {
                             Id = 2,
-                            Percentage = 30.0,
+                            Amount = 100.0,
                             Description = "Samsung 10 New",
                             ProductName = "Samsung 10"
                         });
