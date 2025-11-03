@@ -14,6 +14,17 @@ public class OrderItemConfiguration :IEntityTypeConfiguration<OrderItem>
             id => id.Value,
             dbId => OrderItemId.Of(dbId)
         );
+        
+        builder.Property(c => c.OrderId).HasConversion(
+            id => id.Value,
+            dbId => OrderId.Of(dbId)
+        );
+        
+        builder.HasOne<Order>()
+            .WithMany("OrderItems")
+            .HasForeignKey(c => c.OrderId)
+            .IsRequired();
+        
         builder.HasOne<Product>()
             .WithMany()
             .HasForeignKey(c => c.ProductId);
