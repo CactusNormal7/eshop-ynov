@@ -8,11 +8,11 @@ namespace Ordering.Application.Features.Orders.Commands.CreateOrder;
 public static class CreateOrderCommandMapper
 {
     /// <summary>
-    /// Creates a new Order domain object from the provided OrderDto.
+    /// Creates a new Order domain object from the provided CreateOrderDto.
     /// </summary>
     /// <param name="requestOrder">The data transfer object containing order details.</param>
     /// <returns>A new instance of the Order domain object.</returns>
-    public static Order CreateNewOrderFromDto(OrderDto requestOrder)
+    public static Order CreateNewOrderFromDto(CreateOrderDto requestOrder)
     {
         var shippingAddress = Address.Of(requestOrder.ShippingAddress.FirstName, requestOrder.ShippingAddress.LastName, requestOrder.ShippingAddress.EmailAddress,
             requestOrder.ShippingAddress.AddressLine, requestOrder.ShippingAddress.Country, requestOrder.ShippingAddress.State, requestOrder.ShippingAddress.ZipCode);
@@ -21,6 +21,12 @@ public static class CreateOrderCommandMapper
         var payment = Payment.Of(requestOrder.Payment.CardName, requestOrder.Payment.CardNumber, requestOrder.Payment.Expiration, requestOrder.Payment.Cvv, requestOrder.Payment.PaymentMethod);
        
         var order = Order.Create(customerId: CustomerId.Of(requestOrder.CustomerId), orderName : OrderName.Of(requestOrder.OrderName), shippingAddress: shippingAddress, billingAddress: billingAddress, payment: payment);
+       
+        // Mettre ? jour le statut de la commande si sp?cifi?
+        if (requestOrder.OrderStatus != order.OrderStatus)
+        {
+            order.SetOrderStatus(requestOrder.OrderStatus);
+        }
        
         foreach (var orderItem in requestOrder.OrderItems)
         {
