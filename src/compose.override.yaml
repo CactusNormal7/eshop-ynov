@@ -69,7 +69,14 @@
   
   discount.grpc:
     ports:
-      - "6062:${DISCOUNT_API_PORT}" #http
+      - "6062:${DISCOUNT_GRPC_PORT}" #http
+    environment:
+      - ASPNETCORE_HTTP_PORTS=${DISCOUNT_GRPC_PORT}
+      - ConnectionStrings__DiscountConnection=Data Source = discountDatabase
+
+  discount.api:
+    ports:
+      - "6063:${DISCOUNT_API_PORT}" #http
     environment:
       - ASPNETCORE_HTTP_PORTS=${DISCOUNT_API_PORT}
       - ConnectionStrings__DiscountConnection=Data Source = discountDatabase

@@ -66,6 +66,21 @@
       - discount_network
       - basket_network
 
+  discount.api:
+    image: discount.api
+    container_name: discount_api
+    build:
+      context: .
+      dockerfile: eshop.services/discount/Discount.API/Dockerfile
+    networks:
+      - discount_network
+      - basket_network
+    depends_on:
+      discount.grpc:
+        condition: service_started
+        required: true
+        restart: true
+
 ### Shared infrastructure ###
 volumes:
   catalog_data:
