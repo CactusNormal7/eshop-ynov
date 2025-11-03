@@ -38,4 +38,11 @@
         </Content>
     </ItemGroup>
 
+    <!-- Exclude appsettings.json from publish to avoid conflicts when referenced by other projects -->
+    <ItemGroup>
+        <Content Update="appsettings.json">
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </Content>
+    </ItemGroup>
+
 </Project>

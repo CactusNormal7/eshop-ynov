@@ -1,12 +1,10 @@
-namespace Discount.Grpc.Models;
+namespace Discount.API.Models;
 
 /// <summary>
-/// Représente un code de réduction avec toutes ses propriétés métier.
+/// Requête pour créer un nouveau code promo.
 /// </summary>
-public class Code
+public class CreateCodeRequest
 {
-    public int Id { get; set; }
-    
     /// <summary>
     /// Code unique du coupon (ex: "BLACKFRIDAY2024")
     /// </summary>
@@ -16,11 +14,6 @@ public class Code
     /// Description du code promo
     /// </summary>
     public string Description { get; set; } = string.Empty;
-    
-    /// <summary>
-    /// Règles de cumulabilité (JSON ou texte)
-    /// </summary>
-    public string Rules { get; set; } = string.Empty;
     
     /// <summary>
     /// Montant fixe de réduction
@@ -33,11 +26,6 @@ public class Code
     public double Percentage { get; set; }
     
     /// <summary>
-    /// Statut du code : Active, Expired, Disabled, Upcoming
-    /// </summary>
-    public string Status { get; set; } = "Active";
-    
-    /// <summary>
     /// Date de début de validité
     /// </summary>
     public DateTime? StartDate { get; set; }
@@ -48,7 +36,7 @@ public class Code
     public DateTime? EndDate { get; set; }
     
     /// <summary>
-    /// Montant minimum d'achat requis pour utiliser ce code
+    /// Montant minimum d'achat requis
     /// </summary>
     public double MinimumPurchaseAmount { get; set; }
     
@@ -82,3 +70,42 @@ public class Code
     /// </summary>
     public string? TierRules { get; set; }
 }
+
+/// <summary>
+/// Requête pour mettre à jour un code promo existant.
+/// </summary>
+public class UpdateCodeRequest : CreateCodeRequest
+{
+    /// <summary>
+    /// ID du code à mettre à jour
+    /// </summary>
+    public int Id { get; set; }
+    
+    /// <summary>
+    /// Statut du code : Active, Expired, Disabled, Upcoming
+    /// </summary>
+    public string? Status { get; set; }
+}
+
+/// <summary>
+/// Réponse avec les informations d'un code promo.
+/// </summary>
+public class CodeResponse
+{
+    public int Id { get; set; }
+    public string CodeValue { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public double Amount { get; set; }
+    public double Percentage { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
+    public double MinimumPurchaseAmount { get; set; }
+    public List<string>? ApplicableCategories { get; set; }
+    public bool IsStackable { get; set; }
+    public double? MaxCumulativeDiscountPercentage { get; set; }
+    public bool IsAutomatic { get; set; }
+    public string? AutomaticType { get; set; }
+    public string? TierRules { get; set; }
+}
+
