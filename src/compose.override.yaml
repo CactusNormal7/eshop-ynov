@@ -103,7 +103,7 @@
 
   discount.api:
     ports:
-      - "6063:${DISCOUNT_API_PORT}" #http
+      - "6064:${DISCOUNT_API_PORT}" #http
     environment:
       - ASPNETCORE_HTTP_PORTS=${DISCOUNT_API_PORT}
       - ConnectionStrings__DiscountConnection=Data Source = discountDatabase
