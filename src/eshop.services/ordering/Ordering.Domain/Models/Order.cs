@@ -93,6 +93,16 @@ public class Order : Aggregate<OrderId>
     }
 
     /// <summary>
+    /// Sets the order status to the specified value.
+    /// </summary>
+    /// <param name="orderStatus">The new status of the order.</param>
+    public void SetOrderStatus(OrderStatus orderStatus)
+    {
+        OrderStatus = orderStatus;
+        AddDomainEvent(new OrderUpdatedEvent(this));
+    }
+
+    /// <summary>
     /// Updates the details of the order including name, shipping and billing addresses, payment details, and status.
     /// </summary>
     /// <param name="orderName">The new name of the order.</param>

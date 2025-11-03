@@ -15,7 +15,7 @@ namespace Ordering.Application.Features.Orders.Commands.CreateOrder;
 /// defined validation rules.
 /// </remarks>
 /// <param name="Order">
-/// The order details encapsulated in an <see cref="OrderDto"/> object. It includes
+/// The order details encapsulated in an <see cref="CreateOrderDto"/> object. It includes
 /// information such as the customer ID, order name, addresses, payment details,
 /// status, and items included in the order.
 /// </param>
@@ -23,4 +23,4 @@ namespace Ordering.Application.Features.Orders.Commands.CreateOrder;
 /// A <see cref="CreateOrderCommandResult"/> that contains the unique identifier
 /// of the newly created order.
 /// </returns>
-public record CreateOrderCommand(OrderDto Order) : ICommand<CreateOrderCommandResult>;
+public record CreateOrderCommand(CreateOrderDto Order) : ICommand<CreateOrderCommandResult>;

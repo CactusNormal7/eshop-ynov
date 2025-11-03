@@ -4,6 +4,7 @@ using Ordering.Application.Features.Orders.Commands.CreateOrder;
 using Ordering.Application.Features.Orders.Commands.DeleteOrder;
 using Ordering.Application.Features.Orders.Commands.UpdateOrder;
 using Ordering.Application.Features.Orders.Dtos;
+using Ordering.Application.Features.Orders.Queries.GetOrdersByCustomerId;
 
 namespace Ordering.API.Controllers;
 
@@ -40,8 +41,14 @@ public class OrdersController(ISender sender) : ControllerBase
     [ProducesResponseType(typeof(NotFoundObjectResult), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrdersByCustomerId(Guid customerId)
     {
-        // TODO
-        return Ok();
+        var orders = await sender.Send(new GetOrdersByCustomerIdQuery(customerId));
+        
+        if (!orders.Any())
+        {
+            return NotFound($"No orders found for customer with ID: {customerId}");
+        }
+        
+        return Ok(orders);
     }
 
 
@@ -63,14 +70,14 @@ public class OrdersController(ISender sender) : ControllerBase
     /// <summary>
     /// Creates a new order based on the provided order details.
     /// </summary>
-    /// <param name="order">The <see cref="OrderDto"/> containing details of the order to be created.</param>
+    /// <param name="order">The <see cref="CreateOrderDto"/> containing details of the order to be created.</param>
     /// <returns>The unique identifier of the newly created order.</returns>
     [HttpPost]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
-    public async Task<ActionResult<Guid>> CreateOrder([FromBody] OrderDto order)
+    public async Task<ActionResult<Guid>> CreateOrder([FromBody] CreateOrderDto order)
     {
         var result = await sender.Send(new CreateOrderCommand(order));
-        return Ok(result.NewOrderId);
+        return CreatedAtAction(nameof(CreateOrder), new { id = result.NewOrderId }, result.NewOrderId);
     }
 
     /// <summary>
