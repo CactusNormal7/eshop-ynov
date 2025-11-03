@@ -23,8 +23,8 @@ public class GetOrdersCommandHandler(IOrderingDbContext orderingDbContext): ICom
     {
         var orders = await orderingDbContext.Orders
             .OrderBy(o => EF.Property<Guid>(o, "Id"))
-            // .Skip(request.PageIndex * request.PageSize)
-            // .Take(request.PageSize)
+            .Skip((request.PageIndex - 1) * request.PageSize)
+            .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
         if (orders.Any())

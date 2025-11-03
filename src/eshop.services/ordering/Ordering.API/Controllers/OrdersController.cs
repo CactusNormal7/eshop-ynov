@@ -49,7 +49,7 @@ public class OrdersController(ISender sender) : ControllerBase
     /// <summary>
     /// Retrieves a paginated list of orders based on the specified page index and page size.
     /// </summary>
-    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
+    /// <param name="pageIndex">The one-based index of the page to retrieve (1 = first page).</param>
     /// <param name="pageSize">The number of orders to include in each page of results.</param>
     /// <returns>A collection of <see cref="OrderDto"/> objects representing the paginated list of orders.</returns>
     [HttpGet]

@@ -7,8 +7,8 @@ public class GetOrdersCommandValidator : AbstractValidator<GetOrdersCommand>
     public GetOrdersCommandValidator()
     {
         RuleFor(x => x.PageIndex)
-            .GreaterThanOrEqualTo(0)
-            .WithMessage("Page index must be greater than or equal to 0");
+            .GreaterThanOrEqualTo(1)
+            .WithMessage("Page index must be greater than or equal to 1");
 
         RuleFor(x => x.PageSize)
             .GreaterThan(0)
