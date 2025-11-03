@@ -16,6 +16,7 @@ namespace Discount.Grpc.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    Value = table.Column<int>(type: "INTEGER", nullable: false),
                     Amount = table.Column<double>(type: "REAL", nullable: false),
                     Percentage = table.Column<double>(type: "REAL", nullable: false)
                 },

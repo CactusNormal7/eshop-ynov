@@ -139,12 +139,10 @@ public class DiscountServiceServer(DiscountContext dbContext, ILogger<DiscountSe
     /// </exception>
     public override async Task<CodeModel> GetCode(GetCodeRequest request, ServerCallContext context)
     {
-        logger.LogInformation("Retrieving code with ID {Id}", request.Id);
-        
-        var code = await dbContext.Codes.FirstOrDefaultAsync(x => x.Id == request.Id);
+        var code = await dbContext.Codes.FirstOrDefaultAsync(x => x.Value == request.Value);
         
         if (code == null)
-            throw new RpcException(new Status(StatusCode.NotFound, $"Code with ID {request.Id} not found"));
+            throw new RpcException(new Status(StatusCode.NotFound, $"Code with ID {request.Value} not found"));
         
         logger.LogInformation("Code retrieved with ID {Id}: Amount={Amount}, Percentage={Percentage}", 
             code.Id, code.Amount, code.Percentage);

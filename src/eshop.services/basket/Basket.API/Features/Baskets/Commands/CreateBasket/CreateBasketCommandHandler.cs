@@ -38,12 +38,20 @@ public class CreateBasketCommandHandler(IBasketRepository repository, DiscountPr
     /// <returns>A task that represents the asynchronous operation of applying discounts to the items.</returns>
     private async Task ApplyDiscountToItemAsync(ShoppingCart cart, CancellationToken cancellationToken)
     {
+        var code = await discountProtoServiceClient.GetCodeAsync(new GetCodeRequest { Value = cart.Code }, cancellationToken: cancellationToken);
+        
         foreach (var item in cart.Items)
         {
             var coupon = await discountProtoServiceClient.GetDiscountAsync(new GetDiscountRequest
                 { ProductName = item.ProductName }, cancellationToken: cancellationToken);
             
             item.Price -= (decimal)coupon.Amount;
+            
+            if (code != null && (code.Amount > 0 || code.Percentage > 0))
+            {
+                item.Price -= (decimal)code.Amount;
+                item.Price -= (decimal)code.Percentage / 100 * item.Price;
+            }
         }
     }
 }

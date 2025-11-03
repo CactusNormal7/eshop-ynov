@@ -5,6 +5,8 @@ namespace Discount.Grpc.Models;
 public class Code
 {
     public int Id { get; set; }
+    
+    public int Value { get; set; }
 
     public double Amount { get; set; }
 
