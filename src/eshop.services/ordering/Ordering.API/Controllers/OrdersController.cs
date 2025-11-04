@@ -5,6 +5,7 @@ using Ordering.Application.Features.Orders.Commands.DeleteOrder;
 using Ordering.Application.Features.Orders.Commands.GetOrders;
 using Ordering.Application.Features.Orders.Commands.GetOrdersByCustomerId;
 using Ordering.Application.Features.Orders.Commands.GetOrderById;
+using Ordering.Application.Features.Orders.Commands.GetOrderByName;
 using Ordering.Application.Features.Orders.Commands.UpdateOrder;
 using Ordering.Application.Features.Orders.Dtos;
 using Ordering.Application.Features.Orders.Queries.GetOrdersByCustomerId;
@@ -31,6 +32,26 @@ public class OrdersController(ISender sender) : ControllerBase
     public async Task<ActionResult<OrderDto>> GetOrderById(Guid orderId)
     {
         var result = await sender.Send(new GetOrderByIdCommand(orderId));
+
+        if (result.Order == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(result.Order);
+    }
+
+    /// <summary>
+    /// Retrieves an order by its name.
+    /// </summary>
+    /// <param name="name">The name of the order to retrieve.</param>
+    /// <returns>The <see cref="OrderDto"/> object if found, otherwise returns NotFound.</returns>
+    [HttpGet("name/{name}")]
+    [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(NotFoundObjectResult), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<OrderDto>> GetOrderByName(string name)
+    {
+        var result = await sender.Send(new GetOrderByNameCommand(name));
 
         if (result.Order == null)
         {
