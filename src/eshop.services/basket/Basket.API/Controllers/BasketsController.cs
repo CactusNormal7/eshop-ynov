@@ -1,5 +1,5 @@
-using Basket.API.Features.Baskets.Commands.CheckOutBasket;
 using Basket.API.Features.Baskets.Commands.AddProductToBasket;
+using Basket.API.Features.Baskets.Commands.CheckOutBasket;
 using Basket.API.Features.Baskets.Commands.CreateBasket;
 using Basket.API.Features.Baskets.Commands.DeleteBasket;
 using Basket.API.Features.Baskets.Commands.UpdateBasket;
