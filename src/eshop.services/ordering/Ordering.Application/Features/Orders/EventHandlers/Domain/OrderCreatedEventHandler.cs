@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
 using Ordering.Application.Extensions;
 using Ordering.Domain.Events;
+using BuildingBlocks.Messaging.Events;
+using Ordering.Application.Features.Orders.Dtos;
 
 namespace Ordering.Application.Features.Orders.EventHandlers.Domain;
 
@@ -26,8 +28,44 @@ public class OrderCreatedEventHandler(IPublishEndpoint publishEndpoint, IFeature
 
         if (await featureManager.IsEnabledAsync("OrderFulfilment"))
         {
-            var orderCreatedIntegrationEvent = notification.Order.ToOrderDto();
-            await publishEndpoint.Publish(orderCreatedIntegrationEvent, cancellationToken);
+            var orderDto = notification.Order.ToOrderDto();
+
+            // Generate HTML summary for the order
+            var html = GenerateOrderHtml(orderDto);
+
+            // Publish simple email event
+            var emailEvent = new SendEmailEvent(
+                toEmail: orderDto.BillingAddress.EmailAddress,
+                fromEmail: "noreply@eshop.com",
+                subject: $"Order Confirmation - {orderDto.OrderName}",
+                htmlContent: html
+            );
+
+            await publishEndpoint.Publish(emailEvent, cancellationToken);
         }
+    }
+
+    private static string GenerateOrderHtml(OrderDto order)
+    {
+        // Minimal, safe HTML summary. For production prefer a template engine or Razor.
+        var itemsHtml = string.Join('\n', order.OrderItems.Select(oi =>
+            $"<tr><td>{oi.ProductId}</td><td>{oi.Quantity}</td><td>{oi.Price:C}</td></tr>"));
+
+        var html = $@"<html>
+        <body>
+            <h1>Order Summary</h1>
+            <p>Order Id: {order.Id}</p>
+            <p>Customer: {order.CustomerId}</p>
+            <table border='1' cellpadding='4' cellspacing='0'>
+                <thead><tr><th>ProductId</th><th>Qty</th><th>Price</th></tr></thead>
+                <tbody>
+                    {itemsHtml}
+                </tbody>
+            </table>
+            <p>Total: {order.OrderItems.Sum(i => i.Price * i.Quantity):C}</p>
+        </body>
+        </html>";
+
+        return html;
     }
 }

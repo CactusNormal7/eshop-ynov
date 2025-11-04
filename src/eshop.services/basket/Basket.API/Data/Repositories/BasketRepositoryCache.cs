@@ -1,8 +1,8 @@
+using System;
+using System.Text.Json;
 using Basket.API.Extensions;
 using Basket.API.Models;
 using Microsoft.Extensions.Caching.Distributed;
-using System;
-using System.Text.Json;
 
 namespace Basket.API.Data.Repositories;
 
