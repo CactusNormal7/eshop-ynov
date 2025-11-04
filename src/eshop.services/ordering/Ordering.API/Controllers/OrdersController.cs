@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Ordering.Application.Features.Orders.Commands.CreateOrder;
 using Ordering.Application.Features.Orders.Commands.DeleteOrder;
 using Ordering.Application.Features.Orders.Commands.GetOrders;
+using Ordering.Application.Features.Orders.Commands.GetOrdersByCustomerId;
+using Ordering.Application.Features.Orders.Commands.GetOrderById;
 using Ordering.Application.Features.Orders.Commands.UpdateOrder;
 using Ordering.Application.Features.Orders.Dtos;
 
@@ -18,17 +20,23 @@ namespace Ordering.API.Controllers;
 public class OrdersController(ISender sender) : ControllerBase
 {
     /// <summary>
-    /// Retrieves a list of orders filtered by the provided order name.
+    /// Retrieves an order by its unique identifier.
     /// </summary>
-    /// <param name="name">The name used to filter the orders.</param>
-    /// <returns>A collection of <see cref="OrderDto"/> objects that match the specified name.</returns>
-    [HttpGet("{name}")]
-    [ProducesResponseType(typeof(IEnumerable<OrderDto>), StatusCodes.Status200OK)]
+    /// <param name="orderId">The unique identifier of the order to retrieve.</param>
+    /// <returns>The <see cref="OrderDto"/> object if found, otherwise returns NotFound.</returns>
+    [HttpGet("id/{orderId:guid}")]
+    [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundObjectResult), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrdersByName(string name)
+    public async Task<ActionResult<OrderDto>> GetOrderById(Guid orderId)
     {
-        // TODO
-        return Ok();
+        var result = await sender.Send(new GetOrderByIdCommand(orderId));
+        
+        if (result.Order == null)
+        {
+            return NotFound();
+        }
+        
+        return Ok(result.Order);
     }
 
     /// <summary>
@@ -41,8 +49,8 @@ public class OrdersController(ISender sender) : ControllerBase
     [ProducesResponseType(typeof(NotFoundObjectResult), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrdersByCustomerId(Guid customerId)
     {
-        // TODO
-        return Ok();
+        var result = await sender.Send(new GetOrdersByCustomerIdCommand(customerId));
+        return Ok(result.Orders);
     }
 
 
