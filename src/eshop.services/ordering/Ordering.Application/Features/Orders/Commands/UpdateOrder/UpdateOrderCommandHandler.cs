@@ -30,10 +30,12 @@ public class UpdateOrderCommandHandler(IOrderingDbContext orderingDbContext) : I
             }
             else
             {
+                // For new items, use empty string as name since OrderItemDto doesn't include product name
                 order.AddOrderItem(
                     ProductId.Of(newOrderItem.ProductId),
                     newOrderItem.Quantity,
-                    newOrderItem.Price
+                    newOrderItem.Price,
+                    string.Empty
                 );
             }
 

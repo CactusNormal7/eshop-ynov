@@ -30,7 +30,7 @@ public static class CreateOrderCommandMapper
        
         foreach (var orderItem in requestOrder.OrderItems)
         {
-            order.AddOrderItem(ProductId.Of(orderItem.ProductId), orderItem.Quantity, orderItem.Price);
+            order.AddOrderItem(ProductId.Of(orderItem.ProductId), orderItem.Quantity, orderItem.Price, orderItem.ProductName ?? string.Empty);
         }
        
         return order;
