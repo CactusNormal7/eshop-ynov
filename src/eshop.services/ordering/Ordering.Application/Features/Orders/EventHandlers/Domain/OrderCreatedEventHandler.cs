@@ -40,7 +40,7 @@ public class OrderCreatedEventHandler(
             var emailEvent = new SendEmailEvent(
                 toEmail: orderDto.BillingAddress.EmailAddress,
                 fromEmail: "noreply@eshop.com",
-                subject: $"Order Confirmation - {orderDto.OrderName}",
+                subject: $"Commande reçue - {orderDto.OrderName}",
                 htmlContent: html
             );
 
@@ -63,7 +63,7 @@ public class OrderCreatedEventHandler(
 <head>
     <meta charset=""UTF-8"">
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-    <title>Confirmation de commande - eShop</title>
+    <title>Reçu de commande - eShop</title>
     <style>
         body {{
             margin: 0;
@@ -257,7 +257,7 @@ public class OrderCreatedEventHandler(
                     <tr>
                         <td class=""email-header"">
                             <img src=""https://cdn.discordapp.com/attachments/1039545043419136111/1435582767978119260/eshop.png?ex=690c7e23&is=690b2ca3&hm=ca1500c77ea7b925c37ac640074ebf8341fb731dc1e01aa74fe0a8a4dfd33c85&"" />
-                            <h1 style=""margin: 10px 0 0 0; font-size: 28px; font-weight: 700;"">Confirmation de commande</h1>
+                            <h1 style=""margin: 10px 0 0 0; font-size: 28px; font-weight: 700;"">Commande reçue</h1>
                         </td>
                     </tr>
 
@@ -268,7 +268,7 @@ public class OrderCreatedEventHandler(
                             </div>
 
                             <p style=""font-size: 18px; color: #2c3e50; font-weight: 500;"">
-                                Votre commande n°<strong>{order.Id}</strong> a été confirmée avec succès !
+                                Votre commande n°<strong>{order.Id}</strong> a été reçue avec succès !
                             </p>
 
                             <div class=""order-info"">
