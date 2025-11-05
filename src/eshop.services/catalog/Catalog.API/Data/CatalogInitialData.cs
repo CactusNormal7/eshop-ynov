@@ -17,13 +17,22 @@ public class CatalogInitialData : IInitialData
     /// <returns>A task representing the asynchronous operation.</returns>
     public async Task Populate(IDocumentStore store, CancellationToken cancellation)
     {
-        await using var session = store.LightweightSession();
-        
-        if(await session.Query<Product>().AnyAsync(cancellation))
-            return ;
-        
-        session.Store(GetPreconfiguredProducts());
-        await session.SaveChangesAsync(cancellation);
+        try
+        {
+            await using var session = store.LightweightSession();
+
+            if (await session.Query<Product>().AnyAsync(cancellation))
+                return;
+
+            session.Store(GetPreconfiguredProducts());
+            await session.SaveChangesAsync(cancellation);
+        }
+        catch (Exception ex)
+        {
+            // Do not crash the host if the database is temporarily unavailable (e.g., running locally without Postgres)
+            // Log to console so the developer is aware and can start the database or adjust settings.
+            Console.WriteLine($"[CatalogInitialData] Skipping initial data population due to error: {ex.GetType().Name} - {ex.Message}");
+        }
     }
 
 
