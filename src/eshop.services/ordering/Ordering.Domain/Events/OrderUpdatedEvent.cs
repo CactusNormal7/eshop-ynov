@@ -1,4 +1,5 @@
 using Ordering.Domain.Abstractions;
+using Ordering.Domain.Enums;
 using Ordering.Domain.Models;
 
 namespace Ordering.Domain.Events;
@@ -16,4 +17,8 @@ namespace Ordering.Domain.Events;
 /// Encapsulates all relevant data about the order, including its items, customer,
 /// and associated metadata.
 /// </param>
-public record OrderUpdatedEvent(Order Order) : IDomainEvent;
+/// <param name="OldStatus">
+/// The previous status of the order before the update.
+/// Used to detect status changes and trigger appropriate notifications.
+/// </param>
+public record OrderUpdatedEvent(Order Order, OrderStatus? OldStatus = null) : IDomainEvent;

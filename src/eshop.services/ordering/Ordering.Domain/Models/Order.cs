@@ -99,8 +99,9 @@ public class Order : Aggregate<OrderId>
     /// <param name="orderStatus">The new status of the order.</param>
     public void SetOrderStatus(OrderStatus orderStatus)
     {
+        var oldStatus = OrderStatus;
         OrderStatus = orderStatus;
-        AddDomainEvent(new OrderUpdatedEvent(this));
+        AddDomainEvent(new OrderUpdatedEvent(this, oldStatus));
     }
 
     /// <summary>
@@ -114,13 +115,14 @@ public class Order : Aggregate<OrderId>
     public void Update(OrderName orderName, Address shippingAddress, OrderStatus orderStatus,
         Address billingAddress, Payment payment)
     {
+        var oldStatus = OrderStatus;
         OrderName = orderName;
         ShippingAddress = shippingAddress;
         BillingAddress = billingAddress;
         Payment = payment;
         OrderStatus  = orderStatus;
         
-        AddDomainEvent(new OrderUpdatedEvent(this));
+        AddDomainEvent(new OrderUpdatedEvent(this, oldStatus));
 
     }
 }
