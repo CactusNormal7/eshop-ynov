@@ -27,7 +27,7 @@ public class SendEmailEventHandler(ILogger<SendEmailEventHandler> logger) : ICon
 
             using var client = new SmtpClient("sandbox.smtp.mailtrap.io", 2525)
             {
-                Credentials = new NetworkCredential("a5dd78e874388e", "af043d7fc6374d"),
+                Credentials = new NetworkCredential("c6417f6833e1ce", "3c23dc7eff9036"),
                 EnableSsl = true
             };
 
