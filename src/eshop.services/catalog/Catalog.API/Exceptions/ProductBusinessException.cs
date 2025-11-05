@@ -31,4 +31,10 @@ public class ProductNotFoundException : NotFoundException
     /// be completed due to the absence of a product with the specified identifier.
     /// </summary>
     public ProductNotFoundException(Guid id) : base("produit", id) { }
+    
+    public ProductNotFoundException(string category)
+        : base("produit", $"catégorie '{category}'") { }
+    
+    public ProductNotFoundException(decimal price)
+        : base("produit", $"prix '{price}'") { }
 }

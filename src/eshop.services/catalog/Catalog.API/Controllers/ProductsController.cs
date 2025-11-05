@@ -4,6 +4,8 @@ using Catalog.API.Features.Products.Commands.DeleteProduct;
 using Catalog.API.Features.Products.Commands.ExportProduct;
 using Catalog.API.Features.Products.Commands.UpdateProduct;
 using Catalog.API.Features.Products.Queries.GetProductById;
+using Catalog.API.Features.Products.Queries.GetProductsByCategory;
+using Catalog.API.Features.Products.Queries.GetProductByPrice;
 using Catalog.API.Features.Products.Queries.GetProductsByPagination;
 using Catalog.API.Models;
 using MediatR;
@@ -45,9 +47,33 @@ public class ProductsController(ISender sender) : ControllerBase
     [ProducesResponseType(typeof(BadRequestObjectResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<Product>> GetProductsByCategory(string category)
     {
-        // TODO
         if (string.IsNullOrWhiteSpace(category))
             return BadRequest("Category is required");
+        
+        var result = await sender.Send(new GetProductsByCategoryQuery(category));
+        return Ok(result.Products);
+    }
+
+    /// <summary>
+    /// Retrieves a collection of products within a specified price.
+    /// </summary>
+    /// <param name="price">The price by which to filter the products.</param>
+    /// <returns>A collection of products belonging to the specified price, if found; otherwise, a bad request response.</returns>
+    [HttpGet("price/{price}")]
+    [ProducesResponseType(typeof(IEnumerable<Product>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BadRequestObjectResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<Product>>> GetProductsByPrice(decimal price)
+    {
+        if (price <= 0)
+            return BadRequest("Price must be greater than 0");
+
+        var result = await sender.Send(new GetProductByPriceQuery(price));
+        return Ok(result.Products);
+    }
+
+
+    /// <summary>
+    /// Retrieves a collection of products from the catalog.
 
         var result = await sender.Send(new());
         return Ok();
