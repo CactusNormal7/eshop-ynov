@@ -1,6 +1,15 @@
 ﻿services:
   
+  ### Common Service ###
+  messageBroker:
+    image: rabbitmq:management
+    container_name: messageBroker_rabbitmq
+    hostname: ecommerce-rabbitmq-server
+    networks:
+      - messageBroker_network
+  
   ### Service Catalog ###
+  
   catalog.database:
     image: postgres:latest
     container_name: catalog_database
@@ -12,7 +21,7 @@
     container_name: catalog_api
     build:
       context: .
-      dockerfile: eShop.services/catalog/Catalog.API/Dockerfile
+      dockerfile: eShop.Services/Catalog/Catalog.API/Dockerfile
     networks:
       - catalog_network
     depends_on:
@@ -20,16 +29,157 @@
         condition: service_healthy
         required: true
         restart: true
+  
+  
+  ### Service Discount ###
+  
+  discount.grpc:
+    image: discount.grpc
+    container_name: discount_grpc
+    restart: always
+    build:
+      context: .
+      dockerfile: eShop.Services/Discount/Discount.Grpc/Dockerfile
+    networks:
+      - discount_network
+      - basket_network
+  
+  ### Service Basket ###
+  
+  basket.database:
+    image: postgres:latest
+    container_name: basket_database
+    networks:
+      - basket_network
+  
+  basket.redis:
+    image: redis:latest
+    container_name: basket_redis
+    networks:
+      - basket_network
 
+  basket.api:
+    image: basket.api
+    container_name: basket_api
+    build:
+      context: .
+      dockerfile: eShop.Services/Basket/Basket.API/Dockerfile
+    networks:
+      - basket_network
+      - messageBroker_network
+    depends_on:
+      basket.database:
+        condition: service_healthy
+        required: true
+        restart: true
+      basket.redis:
+        condition: service_healthy
+        required: true
+        restart: true
+      messageBroker:
+        condition: service_healthy
+        required: true
+        restart: true
+      discount.grpc:
+        condition: service_started
+        required: true
+        restart: true
+  
+  ### Service Ordering ###
+
+  ordering.database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ordering_database
+    platform: linux/amd64
+    networks:
+      - ordering_network
+  
+  ordering.api:
+    image: ordering.api
+    container_name: ordering_api
+    build:
+      context: .
+      dockerfile: eShop.Services/Ordering/Ordering.API/Dockerfile
+    networks:
+      - ordering_network
+      - messageBroker_network
+    depends_on:
+      ordering.database:
+        condition: service_started
+        required: true
+        restart: true
+      messageBroker:
+        condition: service_healthy
+        required: true
+        restart: true
+        
+  ### API Gateway ###    
+  
+  yarpapigateway:
+    image: yarpapigateway
+    container_name: yarpapigateway
+    build:
+      context: .
+      dockerfile: eshop.gateway/YarpApiGateway/Dockerfile
+    networks:
+      - ordering_network
+      - basket_network
+      - catalog_network
+    depends_on:
+      ordering.api:
+        condition: service_started
+        required: true
+        restart: true
+      basket.api:
+        condition: service_started
+        required: true
+        restart: true
+      catalog.api:
+        condition: service_started
+        required: true
+        restart: true
+
+  discount.api:
+    image: discount.api
+    container_name: discount_api
+    build:
+      context: .
+      dockerfile: eshop.services/discount/Discount.API/Dockerfile
+    networks:
+      - discount_network
+      - basket_network
+    depends_on:
+      discount.grpc:
+        condition: service_started
+        required: true
+        restart: true
 
 ### Shared infrastructure ###
 volumes:
   catalog_data:
     name: catalog_data
+  basket_data:
+    name: basket_data
+  ordering_data:
+    name: ordering_data
+  redis_data:
+    name: redis_data
+  messageBroker_data:
+    name: messageBroker_data
+  messageBroker_logs:
+    name: messageBroker_logs
 
 
 networks:
   catalog_network:
     name: catalog_network
-
+  basket_network:
+    name: basket_network
+  discount_network:
+    name: discount_network
+  ordering_network:
+    name: ordering_network
+  messageBroker_network:
+    name: messageBroker_network 
+      
 

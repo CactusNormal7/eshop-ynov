@@ -28,7 +28,13 @@ public class CreateProductCommand : ICommand<CreateProductCommandResult>
     public string ImageFile { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the amount of item lefts
+    /// </summary>
+    public int Stock { get; set; }
+    
+    /// <summary>
     /// Gets or sets the list of categories associated with the product being created.
     /// </summary>
     public List<string> Categories { get; set; } = [];
+    
 }
