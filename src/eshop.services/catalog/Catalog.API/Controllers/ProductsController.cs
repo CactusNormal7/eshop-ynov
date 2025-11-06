@@ -71,14 +71,6 @@ public class ProductsController(ISender sender) : ControllerBase
         return Ok(result.Products);
     }
 
-
-    /// <summary>
-    /// Retrieves a collection of products from the catalog.
-
-        var result = await sender.Send(new());
-        return Ok();
-    }
-
     /// <summary>
     /// Retrieves a paginated collection of products from the catalog.
     /// </summary>
